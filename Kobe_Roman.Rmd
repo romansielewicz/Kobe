@@ -20,9 +20,10 @@ kobe.na <- kobe[is.na(kobe$shot_made_flag),]
 #kobe.clean includes all values that are not NA
 kobe.clean <- kobe[!is.na(kobe$shot_made_flag),]
 kobe.clean$one <- rep(1)
+#kobe.clean$year <- as.integer()
 ```
 
-``` {r}
+```{r}
 # Creating Shot Percentages in various zones 
 
 # shot.percent is new dataframe with shot percentage in each basic zone
@@ -102,4 +103,29 @@ zone_map_distance
 zone_percent
 heatmap
 ```
+```{r, Heat Map By Year}
 
+library(dplyr)
+library(grid)
+library(jpeg)
+library(ggplot2)
+library(RCurl)
+
+courtImg.URL <- "https://thedatagame.files.wordpress.com/2016/03/nba_court.jpg"
+court <- rasterGrob(readJPEG(getURLContent(courtImg.URL)),
+           width=unit(1,"npc"), height=unit(1,"npc"))
+heatmap2001 <- ggplot(subset(map.zone.range, season == "2000-01"), aes(x=loc_x, y=loc_y)) +
+      annotation_custom(court, -250, 250, -50, 420) +
+      geom_point(aes(colour = percent, shape = shot_made_flag)) +
+      xlim(-250, 250) +
+      ylim(-50, 420) +scale_color_gradientn(colours = rainbow(8))
+
+heatmap.animation <- ggplot(map.zone.range, aes(x=loc_x, y=loc_y)) +
+      annotation_custom(court, -250, 250, -50, 420) +
+      geom_point(aes(colour = percent, shape = shot_made_flag, frame = season)) +
+      xlim(-250, 250) +
+      ylim(-50, 420) + scale_color_gradientn(colours = rainbow(8))
+
+heatmap2001
+heatmap.animation
+```
